@@ -14,11 +14,31 @@ buildscript {
     }
 }
 
+def loadedModules = [:]
+getSubprojects().forEach {
+    loadedModules.put(it.name, it.path)
+}
+def group = 'np.com.susanthapa.efficientmultimodule'
+
+
 allprojects {
     repositories {
         mavenLocal()
         google()
         jcenter()
+
+        // replace configurations for all modules
+        configurations.all {
+            // get our own dependencies
+            resolutionStrategy.dependencySubstitution.all { dependency ->
+                if (dependency.requested instanceof ModuleComponentSelector && dependency.requested.group == group && loadedModules.containsKey(dependency.requested.module)) {
+                    def targetProject = findProject(loadedModules.get(dependency.requested.module))
+                    if (targetProject != null) {
+                        dependency.useTarget targetProject
+                    }
+                }
+            }
+        }
     }
 }
 

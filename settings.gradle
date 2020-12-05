@@ -1,8 +1,8 @@
 include ':libraries:core'
-include ':libraries:library_b'
-include ':libraries:library_a'
-include ':features:feature_c'
-include ':features:feature_b'
-include ':features:feature_a'
+//include ':libraries:library_b'
+//include ':libraries:library_a'
+//include ':features:feature_c'
+//include ':features:feature_b'
+//include ':features:feature_a'
 include ':app'
 rootProject.name = "EfficientMultiModule"
