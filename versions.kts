@@ -8,9 +8,9 @@ data class Module(
 )
 
 val versionPrefix = "versions."
-val versionFileName = "features/versions.gradle"
+val versionFileName = "versions.gradle"
 
-main(arrayOf("/home/suson/Android-Projects/sanima/features"))
+main(args)
 
 fun main(args: Array<String>) {
     println("running version increment")
@@ -62,6 +62,7 @@ fun updateVersions(
             val newVersion = getIncrementedVersion(it.version)
             val newModule = "$versionPrefix${it.name} = \"$newVersion\""
             outputList[it.position] = newModule
+            println("${it.name}: ${it.version} ----> $newVersion")
             commitMessage.append("\t${it.name}: ${it.version} ----> $newVersion\n")
         }
     }
