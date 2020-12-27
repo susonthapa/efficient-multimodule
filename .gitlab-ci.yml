@@ -5,8 +5,6 @@ stages:
   - appcore_publish
 
 feature_a:
-  tags:
-    - android
   stage: publish
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
@@ -16,8 +14,6 @@ feature_a:
     - ./gradlew :features:feature_a:assembleRelease
 
 feature_b:
-  tags:
-    - android
   stage: publish
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
@@ -27,8 +23,6 @@ feature_b:
     - ./gradlew :features:feature_b:assembleRelease
 
 feature_c:
-  tags:
-    - android
   stage: appcore_publish
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
