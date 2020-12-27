@@ -34,6 +34,7 @@ allprojects {
                 if (dependency.requested instanceof ModuleComponentSelector && dependency.requested.group == group && loadedModules.containsKey(dependency.requested.module)) {
                     def targetProject = findProject(loadedModules.get(dependency.requested.module))
                     if (targetProject != null) {
+                        println("module $dependency.requested.module loaded locally, $dependency.requested.displayName ------> ${loadedModules.get(dependency.requested.module)}")
                         dependency.useTarget targetProject
                     }
                 }
