@@ -8,13 +8,15 @@ data class Module(
 )
 
 val versionPrefix = "versions."
-val versionFileName = "versions.gradle"
+val versionFileName = "features/versions.gradle"
 
 main(arrayOf("/home/suson/Android-Projects/sanima/features"))
 
 fun main(args: Array<String>) {
     println("running version increment")
-    val workingDir = args[0]
+    val workingDir = "features/"
+    val shouldCommit = args[0] == "true"
+
     val delimiter = "@f1soft@"
     val targetPath = "$workingDir/$versionFileName"
     val changedFiles = getChangedFilesFromBaseCommit(workingDir)
@@ -22,15 +24,20 @@ fun main(args: Array<String>) {
     val parsedModules = getParsedModules(delimiter, versionList)
     val changedModules = getChangedModulesName(changedFiles)
     val commitMessage = updateVersions(versionList, parsedModules, changedModules, targetPath)
-    println(commitMessage)
-    
+    if (shouldCommit) {
+        println("creating git commit for version increment")
+        println("commit message: \t\n$commitMessage")
+        commitVersionIncrement(commitMessage)
+    } else {
+        println("only executing dry run")
+    }
 }
 
 fun commitVersionIncrement(commitMessage: String) {
     Runtime.getRuntime().apply {
         exec("export repoUrl=\$(grep \"@\" <<< \$CI_REPOSITORY_URL | cut -d\"@\" -f2)")
-        exec("git config --global user.email \"appdelivery@f1soft.com\"")
-        exec("git config --global user.name \"App Delivery\"")
+        exec("git config --global user.email \"susanthapa202@gmail.com\"")
+        exec("git config --global user.name \"Susan Thapa\"")
         exec("git remote remove origin")
         exec("git remote add origin https://\$GIT_USERNAME:\$GIT_PASSWORD@\$repoUrl")
         exec("git add $versionFileName")

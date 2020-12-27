@@ -1,0 +1,43 @@
+image: shr3jn/android-fastlane:latest
+
+stages:
+  - publish
+  - appcore_publish
+
+feature_a:
+  tags:
+    - android
+  stage: publish
+  only:
+    - merge_requests
+    changes:
+      - features/feature_a/**/*
+  script:
+    - kotlinc -script versions.kts false
+    - ./gradlew :features:feature_a:assembleRelease
+
+feature_b:
+  tags:
+    - android
+  stage: publish
+  only:
+    - merge_requests
+    changes:
+      - features/feature_b/**/*
+  script:
+    - kotlinc -script versions.kts false
+    - ./gradlew :features:feature_b:assembleRelease
+
+feature_c:
+  tags:
+    - android
+  stage: appcore_publish
+  only:
+    - merge_requests
+    changes:
+      - versions.gradle
+  script:
+    - kotlinc -script versions.kts false
+    - ./gradlew :features:feature_c:assembleRelease
+    - git checkout versions.kts
+    - kotlinc -script versions.kts true
