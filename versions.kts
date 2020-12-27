@@ -9,6 +9,7 @@ data class Module(
 
 val versionPrefix = "versions."
 val versionFileName = "versions.gradle"
+val targetBranch = "master"
 
 main(args)
 
@@ -20,9 +21,13 @@ fun main(args: Array<String>) {
     val delimiter = "@f1soft@"
     val targetPath = "$workingDir/$versionFileName"
     val changedFiles = getChangedFilesFromBaseCommit(workingDir)
+    println("changedFiles: $changedFiles")
     val versionList = File(targetPath).readLines()
+    println("versionList: $versionList")
     val parsedModules = getParsedModules(delimiter, versionList)
+    println("parsedModules: $parsedModules")
     val changedModules = getChangedModulesName(changedFiles)
+    println("changedMddules: $changedModules")
     val commitMessage = updateVersions(versionList, parsedModules, changedModules, targetPath)
     if (shouldCommit) {
         println("creating git commit for version increment")
@@ -159,12 +164,12 @@ fun getChangedModulesName(changedFiles: List<String>): List<String> {
         // check for folder
         it.contains("/")
     }.map {
-        it.substring(0, it.indexOf("/"))
+        it.substring(9, it.indexOf("/", 9))
     }.distinct()
 }
 
 fun getChangedFilesFromBaseCommit(workingDir: String): List<String> {
     // get the changed files from the base of the current branch to the HEAD
-    val process = Runtime.getRuntime().exec("git diff --name-only develop..", arrayOf(), File(workingDir))
+    val process = Runtime.getRuntime().exec("git diff --name-only $targetBranch..", arrayOf(), File(workingDir))
     return process.inputStream.bufferedReader().readLines()
 }
