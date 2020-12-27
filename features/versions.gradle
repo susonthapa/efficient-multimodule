@@ -1,0 +1,19 @@
+ext.feature_deps = [:]
+def versions = [:]
+
+//@f1soft@ feature versions
+versions.feature_a = "0.0.1"
+versions.feature_b = "0.0.1"
+versions.feature_c = "0.0.1"
+// @f1soft@
+
+def deps = [:]
+
+// also export the versions
+deps.versions  = versions
+
+// feature modules definition
+
+ext.feature_deps = deps
+
+
