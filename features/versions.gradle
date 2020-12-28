@@ -2,9 +2,9 @@ ext.feature_deps = [:]
 def versions = [:]
 
 //@f1soft@ feature versions
-versions.feature_a = "0.0.4"
-versions.feature_b = "0.0.4"
-versions.feature_c = "0.0.4"
+versions.feature_a = "0.0.6"
+versions.feature_b = "0.0.6"
+versions.feature_c = "0.0.6"
 // @f1soft@
 
 def deps = [:]

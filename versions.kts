@@ -156,14 +156,12 @@ fun getVersionString(version: String): Pair<String, String> {
 fun getChangedModulesName(changedFiles: List<String>): List<String> {
     return changedFiles.filter {
         // check for folder
-        it.contains("/")
+//        it.contains("/")
+        it.indexOf("/", 9) > 0
     }.map {
         // just for test
-        if (it.indexOf("/", 9) > 0) {
-            it.substring(9, it.indexOf("/", 9))
-        } else {
-            it.substring(0, it.indexOf("/"))
-        }
+//        it.substring(0, it.indexOf("/"))
+        it.substring(9, it.indexOf("/", 9))
     }.distinct()
 }
 
