@@ -27,7 +27,7 @@ feature_c:
       when: always
   script:
     - kotlinc -script versions.kts false
-    - git checkout versions.gradle
+    - git checkout features/versions.gradle
     - export repoUrl=$(grep "@" <<< $CI_REPOSITORY_URL | cut -d"@" -f2)
     - git config --global user.email "susanthapa202@gmail.com"
     - git config --global user.name "Susan Thapa"
