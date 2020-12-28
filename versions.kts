@@ -9,7 +9,7 @@ data class Module(
 
 val versionPrefix = "versions."
 val versionFileName = "versions.gradle"
-val targetBranch = "master"
+val targetBranch = "remotes/origin/master"
 
 main(args)
 
