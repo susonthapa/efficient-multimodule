@@ -158,7 +158,12 @@ fun getChangedModulesName(changedFiles: List<String>): List<String> {
         // check for folder
         it.contains("/")
     }.map {
-        it.substring(9, it.indexOf("/", 9))
+        // just for test
+        if (it.indexOf("/", 9) > 0) {
+            it.substring(9, it.indexOf("/", 9))
+        } else {
+            it.substring(0, it.indexOf("/"))
+        }
     }.distinct()
 }
 
