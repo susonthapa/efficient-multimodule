@@ -40,14 +40,8 @@ fun main(args: Array<String>) {
 
 fun commitVersionIncrement(commitMessage: String) {
     Runtime.getRuntime().apply {
-        exec("export repoUrl=\$(grep \"@\" <<< \$CI_REPOSITORY_URL | cut -d\"@\" -f2)")
-        exec("git config --global user.email \"susanthapa202@gmail.com\"")
-        exec("git config --global user.name \"Susan Thapa\"")
-        exec("git remote remove origin")
-        exec("git remote add origin https://\$GIT_USERNAME:\$GIT_PASSWORD@\$repoUrl")
         exec("git add $versionFileName")
         exec("git commit -m $commitMessage")
-        exec("git push origin \$CI_COMMIT_REF_NAME")
     }
 }
 
