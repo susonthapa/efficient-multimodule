@@ -10,7 +10,7 @@ feature_a:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
       when: always
   script:
-    - kotlinc -script versions.kts false
+    - kotlinc -script versions.kts
 
 feature_b:
   stage: publish
@@ -18,7 +18,7 @@ feature_b:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
       when: always
   script:
-    - kotlinc -script versions.kts false
+    - kotlinc -script versions.kts
 
 feature_c:
   stage: appcore_publish
@@ -26,11 +26,10 @@ feature_c:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
       when: always
   script:
-    - kotlinc -script versions.kts false
-    - git checkout features/versions.gradle
-    - export repoUrl=$(grep "@" <<< $CI_REPOSITORY_URL | cut -d"@" -f2)
     - git config --global user.email "susanthapa202@gmail.com"
     - git config --global user.name "Susan Thapa"
+    - kotlinc -script versions.kts
+    - export repoUrl=$(grep "@" <<< $CI_REPOSITORY_URL | cut -d"@" -f2)
     - git remote remove origin
     - git remote add origin https://$GIT_USERNAME:$GIT_PASSWORD@$repoUrl
     - kotlinc -script versions.kts true

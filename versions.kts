@@ -2,21 +2,22 @@ import java.io.File
 import java.lang.StringBuilder
 
 data class Module(
-        val name: String,
-        val version: String,
-        val position: Int
+    val name: String,
+    val version: String,
+    val position: Int
 )
 
 val versionPrefix = "versions."
 val versionFileName = "versions.gradle"
-val targetBranch = "remotes/origin/master"
+val targetBranch = "remotes/origin/test_script"
+val modulePrefix = ""
 
 main(args)
 
 fun main(args: Array<String>) {
     println("running version increment")
-    val workingDir = "features/"
-    val shouldCommit = args[0] == "true"
+    val workingDir = System.getProperty("user.dir")
+    println(workingDir)
 
     val delimiter = "@f1soft@"
     val targetPath = "$workingDir/$versionFileName"
@@ -28,30 +29,25 @@ fun main(args: Array<String>) {
     println("parsedModules: $parsedModules")
     val changedModules = getChangedModulesName(changedFiles)
     println("changedMddules: $changedModules")
-    val commitMessage = updateVersions(versionList, parsedModules, changedModules, targetPath)
-    if (shouldCommit) {
-        println("creating git commit for version increment")
-        println("commit message: \t\n$commitMessage")
-        commitVersionIncrement(commitMessage)
-    } else {
-        println("only executing dry run")
-    }
+    val changedModulesDetails =
+        updateVersions(versionList, parsedModules, changedModules, targetPath)
+    saveChangeLog(changedModulesDetails)
 }
 
-fun commitVersionIncrement(commitMessage: String) {
-    Runtime.getRuntime().apply {
-        exec("git add $versionFileName")
-        exec("git commit -m $commitMessage")
-    }
+fun saveChangeLog(changedModules: String) {
+    val outputFile = File("changed_modules.txt")
+    val writer = outputFile.outputStream().bufferedWriter()
+    writer.write(changedModules)
+    writer.close()
 }
 
 fun updateVersions(
-        versionList: List<String>,
-        parsedModules: List<Module>,
-        changedModules: List<String>,
-        outputFilePath: String
+    versionList: List<String>,
+    parsedModules: List<Module>,
+    changedModules: List<String>,
+    outputFilePath: String
 ): String {
-    val commitMessage = StringBuilder("updated versions: \n")
+    val updatedVersions = StringBuilder("updated versions: \n")
     val outputList = versionList.toMutableList()
     // loop through all the parsed modules
     parsedModules.forEach {
@@ -62,7 +58,7 @@ fun updateVersions(
             val newModule = "$versionPrefix${it.name} = \"$newVersion\""
             outputList[it.position] = newModule
             println("${it.name}: ${it.version} ----> $newVersion")
-            commitMessage.append("\t${it.name}: ${it.version} ----> $newVersion\n")
+            updatedVersions.append("\t${it.name}: ${it.version} ----> $newVersion\n")
         }
     }
 
@@ -74,14 +70,14 @@ fun updateVersions(
     }
     writer.close()
     // remove last empty new line
-    var trimmedMessage = commitMessage.toString()
-    trimmedMessage = if (trimmedMessage.lastIndexOf("\n") > 0) {
-        trimmedMessage.substring(0, trimmedMessage.lastIndexOf("\n"))
+    var trimmerVersions = updatedVersions.toString()
+    trimmerVersions = if (trimmerVersions.lastIndexOf("\n") > 0) {
+        trimmerVersions.substring(0, trimmerVersions.lastIndexOf("\n"))
     } else {
-        trimmedMessage
+        trimmerVersions
     }
 
-    return trimmedMessage
+    return trimmerVersions
 }
 
 fun commitChanges() {
@@ -154,19 +150,40 @@ fun getVersionString(version: String): Pair<String, String> {
 }
 
 fun getChangedModulesName(changedFiles: List<String>): List<String> {
-    return changedFiles.filter {
-        // check for folder
-//        it.contains("/")
-        it.indexOf("/", 9) > 0
+    val settingsFile = File("settings.gradle")
+    val loadedModules = settingsFile.inputStream().bufferedReader().readLines()
+        .filter {
+            if (modulePrefix.isEmpty()) {
+                it.contains("include")
+            } else {
+                it.contains(modulePrefix)
+            }
+        }
+        .map {
+            if (modulePrefix.isEmpty()) {
+                it.substring(it.indexOf(":") + 1, it.length - 1)
+            } else {
+                it.substring(it.indexOf(modulePrefix), it.length - 1).replace(":", "/")
+            }
+        }
+
+    return loadedModules.filter {
+        changedFiles.find { file ->
+            file.contains(it)
+        } != null
     }.map {
-        // just for test
-//        it.substring(0, it.indexOf("/"))
-        it.substring(9, it.indexOf("/", 9))
-    }.distinct()
+        if (modulePrefix.isEmpty()) {
+            it
+        } else {
+            val lastSlash = it.lastIndexOf("/")
+            it.substring(lastSlash + 1)
+        }
+    }
 }
 
 fun getChangedFilesFromBaseCommit(workingDir: String): List<String> {
     // get the changed files from the base of the current branch to the HEAD
-    val process = Runtime.getRuntime().exec("git diff --name-only $targetBranch..", arrayOf(), File(workingDir))
+    val process = Runtime.getRuntime()
+        .exec("git diff --name-only $targetBranch..", arrayOf(), File(workingDir))
     return process.inputStream.bufferedReader().readLines()
 }
