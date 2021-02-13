@@ -17,7 +17,12 @@ main(args)
 fun main(args: Array<String>) {
     println("running version increment")
     val workingDir = System.getProperty("user.dir")
-    println(workingDir)
+    println("workingDir: $workingDir")
+    val defaultModule = if (args.isNotEmpty()) {
+        args[0]
+    } else {
+        null
+    }
 
     val delimiter = "@f1soft@"
     val targetPath = "$workingDir/$versionFileName"
@@ -27,8 +32,16 @@ fun main(args: Array<String>) {
     println("versionList: $versionList")
     val parsedModules = getParsedModules(delimiter, versionList)
     println("parsedModules: $parsedModules")
-    val changedModules = getChangedModulesName(changedFiles)
-    println("changedMddules: $changedModules")
+    val changedModules = getChangedModulesName(changedFiles).toMutableList()
+    if (defaultModule != null) {
+        // check if already have changes in the default module, otherwise fake the changes to trigger version update
+        val defaultModuleNotPresent = changedModules.filter { it == defaultModule } == null
+        if (defaultModuleNotPresent) {
+            println("adding default module: $defaultModule")
+            changedModules.add(defaultModule)
+        }
+
+    println("changedModules: $changedModules")
     val changedModulesDetails =
         updateVersions(versionList, parsedModules, changedModules, targetPath)
     saveChangeLog(changedModulesDetails)
@@ -92,7 +105,7 @@ fun getIncrementedVersion(version: String): String {
     var minor = versionPart.substring(0, minorIndex).toInt()
     var patch = versionPart.substring(minorIndex + 1).toInt()
 
-    if (patch > 98) {
+    if (patch > 998) {
         patch = 0
         minor++
     } else {

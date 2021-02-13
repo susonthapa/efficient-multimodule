@@ -8,17 +8,27 @@ feature_a:
   stage: publish
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
+      changes:
+        - feature_a/**/*
       when: always
   script:
     - kotlinc -script versions.kts
+    - cat changed_modules.txt
+    - echo "building module"
+    - echo "publishing module"
 
 feature_b:
   stage: publish
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
+      changes:
+        - feature_b/**/*
       when: always
   script:
     - kotlinc -script versions.kts
+    - cat changed_modules.txt
+    - echo "building module"
+    - echo "publishing module"
 
 feature_c:
   stage: appcore_publish
@@ -26,11 +36,8 @@ feature_c:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^master$/'
       when: always
   script:
-    - git config --global user.email "susanthapa202@gmail.com"
-    - git config --global user.name "Susan Thapa"
-    - kotlinc -script versions.kts
-    - export repoUrl=$(grep "@" <<< $CI_REPOSITORY_URL | cut -d"@" -f2)
-    - git remote remove origin
-    - git remote add origin https://$GIT_USERNAME:$GIT_PASSWORD@$repoUrl
-    - kotlinc -script versions.kts true
-    - git push origin $CI_COMMIT_REF_NAME
+    - kotlinc -script versions.kts feature_c
+    - cat changed_modules.txt
+    - echo "building module"
+    - echo "publishing module"
+    - echo "committing changes"
